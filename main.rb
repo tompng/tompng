@@ -34,28 +34,19 @@ curves = packed.map do |x,y,s|
     (v=c.shift(4).join.to_i 2)>7?v-=16:v :
     (v=c.shift(5+2*a=c.shift.to_i).join.to_i 2)>15+a*48?v-40-a*112:v+7+a*15
   )while c[0]
-  n.each_slice(6).map{|b|[x,y,*b,x+=b[0]+b[2]+b[4],y+=b[1]+b[3]+b[5]]}
+  n.each_slice(6).map{|a,b,c,d,e,f|[x,y,a,b,a+c,b+d,s=a+c+e,t=b+d+f,x+=s,y+=t]}
 end
 
-colors = [1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5]
 rows, cols = IO.console&.winsize||[0,0]
 size = [[rows * 2, cols].min,48].max
 canvas = Array.new(size) { [0] * size }
-curves.zip(colors).each do |curve, color|
+curves.zip([1,2,*([3]*8),4,4,*([5]*6)]) do |curve, color|
   coords = []
-  curve.each do |x, y, dx1, dy1, dx2, dy2, dx3, dy3|
-    dx=dx1+dx2+dx3
-    dy=dy1+dy2+dy3
-    step = (dx.abs + dy.abs) * size / 1024 + 1
-    step.times do |i|
-      t = i.fdiv step
-      a = 3 * t * (1 - t) * (1 - t)
-      b = 3 * t * t * (1 - t)
-      c = t * t * t
-      coords.push [
-        (x + a * dx1 + b * (dx1+dx2) + c * dx) * size / 1024,
-        (y + a * dy1 + b * (dy1+dy2) + c * dy) * size / 1024
-      ]
+  curve.each do |x,y,q,r,s,t,u,v|
+    n=1+(u.abs+v.abs)*w=size/1024.0
+    n.to_i.times do |i|
+      a=3*(1-z=i/n)**2*z
+      coords<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]
     end
   end
   segments = {}
