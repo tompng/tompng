@@ -23,7 +23,7 @@ packed = curves_base.map do |numbers|
   [[bits.join+'1'].pack('b*')].pack('m').delete("\n=")
 end
 
-colors = [0.1, 0.4, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8, 1, 1, 1, 1, 1, 1]
+colors = [1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5]
 
 curves_base = packed.map do |s|
   cs = s.unpack('m')[0].unpack('b*')[0].chars.map(&:to_i)
@@ -109,12 +109,13 @@ end
 
 (size / 2).times do |y|
   puts size.times.map{|x|
-    a = canvas[x][2 * y]
-    b = canvas[x][2 * y + 1]
-    ai = (a * 3.99).floor
-    bi = (b * 3.99).floor
-    ai = 1 if a > 0 && ai == 0
-    bi = 1 if b > 0 && bi == 0
-    [%( '"^),%(.:TY),%(,;EP),%(xLJ#)][bi][ai]
+    [
+      %( `''"^),
+      %(.:]TYY),
+      %(,;IEPP),
+      %(cjL8RR),
+      %(xLJ&WW),
+      %(xLJ&##)
+    ][canvas[x][2 * y + 1]][canvas[x][2 * y]]
   }.join.gsub(/ +$/, '')
 end
