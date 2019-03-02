@@ -7,23 +7,22 @@ colors = data.scan(/<path fill="#(.{6})"/).map do |(color)|
 end
 colors = colors.map { |c| (c - colors.min) / (colors.max - colors.min) * 0.9 + 0.1 }
 
+starts = []
 curves_base = data.scan(/d="[^"]+"/).map do |s|
   x, y, *other = s.scan(/-?\d+/).map(&:to_i)
-
-  [x, y, *other.each_slice(6).map{|a,b,c,d,e,f|
-    [a, b, c-a, d-b, e-c, f-d]
-  }.flatten]
+  starts.push [x, y]
+  other.each_slice(6).map { |a,b,c,d,e,f| [a, b, c - a, d - b, e - c, f - d] }.flatten
 end
-
-packed = curves_base.map{|a|
-  [[a.map { |v|
+packed = curves_base.map do |numbers|
+  bits = numbers.map do |v|
     next [0, 4.times.map{|i|(v>>i)&1}.reverse] if -8 <= v && v < 8
     v -= v > 0 ? 8-1 : -8
     next [1, 0, 5.times.map{|i|(v>>i)&1}.reverse] if -16 <= v && v < 16
     v -= v > 0 ? 16-1 : -16
-    next [1, 1, 11.times.map{|i|(v>>i)&1}.reverse]
-  }.join+'1'].pack('b*')].pack('m').delete("\n=")
-}
+    next [1, 1, 7.times.map{|i|(v>>i)&1}.reverse]
+  end
+  [[bits.join+'1'].pack('b*')].pack('m').delete("\n=")
+end
 
 colors = [0.1, 0.4, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8, 1, 1, 1, 1, 1, 1]
 
@@ -45,8 +44,8 @@ curves_base = packed.map do |s|
       v += v > 0 ? 8 - 1 : -8
     else
       cs.shift(2)
-      v = cs.shift(11).join.to_i(2)
-      v -= 2048 if v >= 1024
+      v = cs.shift(7).join.to_i(2)
+      v -= 128 if v >= 64
       v += v > 0 ? 8 - 1 + 16 - 1 : -8 - 16
     end
     aaa << v
@@ -54,8 +53,8 @@ curves_base = packed.map do |s|
   aaa
 end
 
-curves = curves_base.map do |(x, y, *other)|
-  other.each_slice(6).map do |bez|
+curves = curves_base.zip(starts).map do |numbers, (x, y)|
+  numbers.each_slice(6).map do |bez|
     [x, y, *bez].tap do
       x += bez[0]+bez[2]+bez[4]
       y += bez[1]+bez[3]+bez[5]
