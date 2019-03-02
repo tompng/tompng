@@ -1,4 +1,3 @@
-require 'pry'
 data = File.read 'tompng.svg'
 colors = data.scan(/<path fill="#(.{6})"/).map do |(color)|
   rgb = color.scan(/../).map { |c| c.to_i(16) }
@@ -23,47 +22,53 @@ packed = curves_base.zip(starts).map do |numbers,(sx,sy)|
   [sx,sy,[[bits.join+'1'].pack('b*')].pack('m').delete("\n=")]
 end
 
+code = File.read(__FILE__).split(/\nexit\n/).last
+packed_rb = '[' + packed.map { |x,y,s| "[#{x},#{y},%w(#{s})*l]" }.join(',') + ']'
+code = code.gsub('packed', packed_rb).gsub(/\n */,'')
+puts code
+eval code
+exit
 
-require'io/console'
-h,w=IO.console&.winsize||[0,0]
-l=''
-g=(0...m=[[h*2,w].min,48].max).map{[0]*m}
+require'io/console';
+h,w=IO.console&.winsize||[0,0];
+l='';
+g=(0...m=[[h*2,w].min,48].max).map{[0]*m};
 packed.map{|x,y,c|
-  c=c.unpack('m')[0].unpack('b*')[0].chars
-  []while'1'!=c.pop
-  n=[]
+  c=c.unpack('m')[0].unpack('b*')[0].chars;
+  []while'1'!=c.pop;
+  n=[];
   n<<(
     c.shift==?0 ?
     (v=(c.shift(4)*l).to_i 2)>7?v-=16:v :
     (v=(c.shift(5+2*a=c.shift.to_i)*l).to_i 2)>15+a*48?v-40-a*112:v+7+a*15
-  )while c[0]
-  c=[]
+  )while c[0];
+  c=[];
   n.each_slice(6).map{|q,r,s,t,u,v|
-    u+=s+=q
-    v+=t+=r
-    n=1+(u.abs+v.abs)*w=m/1024.0
+    u+=s+=q;
+    v+=t+=r;
+    n=1+(u.abs+v.abs)*w=m/1024.0;
     n.to_i.times{|i|
-      a=3*(1-z=i/n)**2*z
+      a=3*(1-z=i/n)**2*z;
       c<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]
-    }
-    x+=u
+    };
+    x+=u;
     y+=v
-  }
+  };
   c
 }.zip([1,2,*([3]*8),4,4,*([5]*6)]){|c,a|
-  s={}
+  s={};
   c.size.times{|i|
-    u,v=c[i-2]
-    x,y=c[i-1]
-    x0,x1=[u,x].sort
+    u,v=c[i-2];
+    x,y=c[i-1];
+    x0,x1=[u,x].sort;
     (x0.ceil..x1.floor).each{|j|
       j!=u&&(j!=x||(u-x)*(c[i][0]-x)<0)&&(s[j]||=[])<<v+(y-v)*(j-u)/(x-u)
     }
-  }
+  };
   s.each{|i,t|
     t.sort.each_slice(2){|u,v|
       (u.ceil...v).each{|j|g[j][i]=a}
     }
   }
-}
-puts g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|%( `''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}*l).gsub(/ +$/,'')}
+};
+puts g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|%(#{32.chr}`''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}*l).gsub(/ +$/,'')}
