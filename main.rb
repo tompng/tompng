@@ -26,6 +26,7 @@ end
 
 require'io/console'
 h,w=IO.console&.winsize||[0,0]
+l=''
 g=(0...m=[[h*2,w].min,48].max).map{[0]*m}
 packed.map{|x,y,c|
   c=c.unpack('m')[0].unpack('b*')[0].chars
@@ -33,8 +34,8 @@ packed.map{|x,y,c|
   n=[]
   n<<(
     c.shift==?0 ?
-    (v=c.shift(4).join.to_i 2)>7?v-=16:v :
-    (v=c.shift(5+2*a=c.shift.to_i).join.to_i 2)>15+a*48?v-40-a*112:v+7+a*15
+    (v=(c.shift(4)*l).to_i 2)>7?v-=16:v :
+    (v=(c.shift(5+2*a=c.shift.to_i)*l).to_i 2)>15+a*48?v-40-a*112:v+7+a*15
   )while c[0]
   c=[]
   n.each_slice(6).map{|q,r,s,t,u,v|
@@ -65,5 +66,4 @@ packed.map{|x,y,c|
     }
   }
 }
-
-puts g.each_slice(2).map{|a,b|a.zip(b).map{|i,j|%( `''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.gsub(/ +$/,'')}
+puts g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|%( `''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}*l).gsub(/ +$/,'')}
