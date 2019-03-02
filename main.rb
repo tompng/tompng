@@ -25,7 +25,11 @@ end
 
 
 require 'io/console'
-curves = packed.map do |x,y,s|
+
+rows, cols = IO.console&.winsize||[0,0]
+size = [[rows * 2, cols].min,48].max
+canvas = Array.new(size) { [0] * size }
+packed.map{|x,y,s|
   c=s.unpack('m')[0].unpack('b*')[0].chars
   []while'1'!=c.pop
   n=[]
@@ -34,21 +38,20 @@ curves = packed.map do |x,y,s|
     (v=c.shift(4).join.to_i 2)>7?v-=16:v :
     (v=c.shift(5+2*a=c.shift.to_i).join.to_i 2)>15+a*48?v-40-a*112:v+7+a*15
   )while c[0]
-  n.each_slice(6).map{|a,b,c,d,e,f|[x,y,a,b,a+c,b+d,s=a+c+e,t=b+d+f,x+=s,y+=t]}
-end
-
-rows, cols = IO.console&.winsize||[0,0]
-size = [[rows * 2, cols].min,48].max
-canvas = Array.new(size) { [0] * size }
-curves.zip([1,2,*([3]*8),4,4,*([5]*6)]) do |curve, color|
-  coords = []
-  curve.each do |x,y,q,r,s,t,u,v|
+  c = []
+  n.each_slice(6).map{|q,r,s,t,u,v|
+    u+=s+=q
+    v+=t+=r
     n=1+(u.abs+v.abs)*w=size/1024.0
     n.to_i.times{|i|
       a=3*(1-z=i/n)**2*z
-      coords<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]
+      c<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]
     }
-  end
+    x+=u
+    y+=v
+  }
+  c
+}.zip([1,2,*([3]*8),4,4,*([5]*6)]) do |coords, color|
   segments = {}
   coords.size.times{|i|
     u,v=coords[i-2]
