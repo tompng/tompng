@@ -63,8 +63,8 @@ end
 
 require 'io/console'
 
-rows, cols = IO.console.winsize
-size = [rows * 2, cols].min
+rows, cols = IO.console&.winsize||[0,0]
+size = [[rows * 2, cols].min,48].max
 canvas = Array.new(size) { [0] * size }
 curves.zip(colors).each do |curve, color|
   coords = []
