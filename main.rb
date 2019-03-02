@@ -27,10 +27,10 @@ end
 require 'io/console'
 
 rows, cols = IO.console&.winsize||[0,0]
-size = [[rows * 2, cols].min,48].max
-canvas = Array.new(size) { [0] * size }
-packed.map{|x,y,s|
-  c=s.unpack('m')[0].unpack('b*')[0].chars
+m = [[rows * 2, cols].min,48].max
+g = Array.new(m) { [0] * m }
+packed.map{|x,y,c|
+  c=c.unpack('m')[0].unpack('b*')[0].chars
   []while'1'!=c.pop
   n=[]
   n<<(
@@ -42,7 +42,7 @@ packed.map{|x,y,s|
   n.each_slice(6).map{|q,r,s,t,u,v|
     u+=s+=q
     v+=t+=r
-    n=1+(u.abs+v.abs)*w=size/1024.0
+    n=1+(u.abs+v.abs)*w=m/1024.0
     n.to_i.times{|i|
       a=3*(1-z=i/n)**2*z
       c<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]
@@ -51,21 +51,21 @@ packed.map{|x,y,s|
     y+=v
   }
   c
-}.zip([1,2,*([3]*8),4,4,*([5]*6)]) do |coords, color|
-  segments = {}
-  coords.size.times{|i|
-    u,v=coords[i-2]
-    x,y=coords[i-1]
+}.zip([1,2,*([3]*8),4,4,*([5]*6)]){|c,a|
+  s = {}
+  c.size.times{|i|
+    u,v=c[i-2]
+    x,y=c[i-1]
     x0,x1=[u,x].sort
     (x0.ceil..x1.floor).each{|j|
-      j!=u&&(j!=x||(u-x)*(coords[i][0]-x)<0)&&(segments[j]||=[])<<v+(y-v)*(j-u)/(x-u)
+      j!=u&&(j!=x||(u-x)*(c[i][0]-x)<0)&&(s[j]||=[])<<v+(y-v)*(j-u)/(x-u)
     }
   }
-  segments.each{|i,s|
-    s.sort.each_slice(2){|a,b|
-      (a.ceil...b).each{|j|canvas[j][i]=color}
+  s.each{|i,t|
+    t.sort.each_slice(2){|u,v|
+      (u.ceil...v).each{|j|g[j][i]=a}
     }
   }
-end
+}
 
-puts canvas.each_slice(2).map{|a,b|a.zip(b).map{|i,j|%( `''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.gsub(/ +$/,'')}
+puts g.each_slice(2).map{|a,b|a.zip(b).map{|i,j|%( `''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.gsub(/ +$/,'')}
