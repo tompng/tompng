@@ -63,16 +63,15 @@ curves = curves_base.map do |(x, y, *other)|
   end
 end
 
-def show(canvas, n=16)
-  step = canvas.size / n
-  aa = (step / 2).times.map do |y|
-    line = step.times.map do |x|
-      a = (n * n).times.sum { |i|canvas[n * x + i % n][2 * y * n + i / n] }.fdiv(n * n)
-      b = (n * n).times.sum { |i|canvas[n * x + i % n][(2 * y + 1)* n + i / n] }.fdiv(n * n)
-      ai = a < 0 ? 0 : a >= 1 ? 3 : (a * 4).floor
-      bi = b < 0 ? 0 : b >= 1 ? 3 : (b * 4).floor
-      ai = 1 if (a>0 && ai == 0)
-      bi = 1 if (b>0 && bi == 0)
+def show(canvas)
+  aa = (canvas.size / 2).times.map do |y|
+    line = canvas.size.times.map do |x|
+      a = canvas[x][2 * y]
+      b = canvas[x][2 * y + 1]
+      ai = (a * 3.99).floor
+      bi = (b * 3.99).floor
+      ai = 1 if a > 0 && ai == 0
+      bi = 1 if b > 0 && bi == 0
       [%( '"^),%(.:TY),%(,;EP),%(xLJ#)][bi][ai]
     end
     line.join
@@ -128,7 +127,7 @@ def render(curves, colors, time)
       end
     end
   end
-  show(canvas, 1)
+  show(canvas)
 end
 
 t0 = Time.now
