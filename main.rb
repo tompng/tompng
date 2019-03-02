@@ -12,7 +12,7 @@ curves_base = data.scan(/d="[^"]+"/).map do |s|
   starts.push [x, y]
   other.each_slice(6).map { |a,b,c,d,e,f| [a, b, c - a, d - b, e - c, f - d] }.flatten
 end
-packed = curves_base.map do |numbers|
+packed = curves_base.zip(starts).map do |numbers,(sx,sy)|
   bits = numbers.map do |v|
     next [0, 4.times.map{|i|(v>>i)&1}.reverse] if -8 <= v && v < 8
     v -= v > 0 ? 8-1 : -8
@@ -20,49 +20,24 @@ packed = curves_base.map do |numbers|
     v -= v > 0 ? 16-1 : -16
     next [1, 1, 7.times.map{|i|(v>>i)&1}.reverse]
   end
-  [[bits.join+'1'].pack('b*')].pack('m').delete("\n=")
+  [sx,sy,[[bits.join+'1'].pack('b*')].pack('m').delete("\n=")]
+end
+
+
+require 'io/console'
+curves = packed.map do |x,y,s|
+  c=s.unpack('m')[0].unpack('b*')[0].chars
+  []while'1'!=c.pop
+  n=[]
+  n<<(
+    c.shift==?0 ?
+    (v=c.shift(4).join.to_i 2)>7?v-=16:v :
+    (v=c.shift(5+2*a=c.shift.to_i).join.to_i 2)>15+a*48?v-40-a*112:v+7+a*15
+  )while c[0]
+  n.each_slice(6).map{|b|[x,y,*b,x+=b[0]+b[2]+b[4],y+=b[1]+b[3]+b[5]]}
 end
 
 colors = [1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5]
-
-curves_base = packed.map do |s|
-  cs = s.unpack('m')[0].unpack('b*')[0].chars.map(&:to_i)
-  cs.pop while cs.last == 0
-  cs.pop
-  aaa = []
-  loop do
-    break if cs.empty?
-    if cs[0] == 0
-      cs.shift
-      v = cs.shift(4).join.to_i(2)
-      v -= 16 if v >= 8
-    elsif cs[1] == 0
-      cs.shift(2)
-      v = cs.shift(5).join.to_i(2)
-      v -= 32 if v >= 16
-      v += v > 0 ? 8 - 1 : -8
-    else
-      cs.shift(2)
-      v = cs.shift(7).join.to_i(2)
-      v -= 128 if v >= 64
-      v += v > 0 ? 8 - 1 + 16 - 1 : -8 - 16
-    end
-    aaa << v
-  end
-  aaa
-end
-
-curves = curves_base.zip(starts).map do |numbers, (x, y)|
-  numbers.each_slice(6).map do |bez|
-    [x, y, *bez].tap do
-      x += bez[0]+bez[2]+bez[4]
-      y += bez[1]+bez[3]+bez[5]
-    end
-  end
-end
-
-require 'io/console'
-
 rows, cols = IO.console&.winsize||[0,0]
 size = [[rows * 2, cols].min,48].max
 canvas = Array.new(size) { [0] * size }
