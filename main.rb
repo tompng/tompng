@@ -50,22 +50,19 @@ curves.zip([1,2,*([3]*8),4,4,*([5]*6)]) do |curve, color|
     }
   end
   segments = {}
-  coords.each_with_index do |(next_x, next_y), i|
-    prev_x, prev_y = coords[i-1]
-    xb = coords[i+1-coords.size][0]
-    x0, x1 = [prev_x, next_x].sort
-    (x0.ceil..x1.floor).each do |ix|
-      next if ix == prev_x || (ix == next_x && (prev_x - next_x) * (xb - next_x) >= 0)
-      (segments[ix] ||= []) << prev_y + (next_y - prev_y) * (ix - prev_x) / (next_x - prev_x)
-    end
-  end
-  segments.each do |ix, ys|
-    ys.sort.each_slice(2) do |y1, y2|
-      (y1.ceil...y2).each do |iy|
-        canvas[ix][iy] = color
-      end
-    end
-  end
+  coords.size.times{|i|
+    u,v=coords[i-2]
+    x,y=coords[i-1]
+    x0,x1=[u,x].sort
+    (x0.ceil..x1.floor).each{|j|
+      j!=u&&(j!=x||(u-x)*(coords[i][0]-x)<0)&&(segments[j]||=[])<<v+(y-v)*(j-u)/(x-u)
+    }
+  }
+  segments.each{|i,s|
+    s.sort.each_slice(2){|a,b|
+      (a.ceil...b).each{|j|canvas[i][j]=color}
+    }
+  }
 end
 
 (size / 2).times do |y|
