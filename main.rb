@@ -44,10 +44,10 @@ curves.zip([1,2,*([3]*8),4,4,*([5]*6)]) do |curve, color|
   coords = []
   curve.each do |x,y,q,r,s,t,u,v|
     n=1+(u.abs+v.abs)*w=size/1024.0
-    n.to_i.times do |i|
+    n.to_i.times{|i|
       a=3*(1-z=i/n)**2*z
       coords<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]
-    end
+    }
   end
   segments = {}
   coords.each_with_index do |(next_x, next_y), i|
