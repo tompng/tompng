@@ -60,20 +60,9 @@ curves.zip([1,2,*([3]*8),4,4,*([5]*6)]) do |curve, color|
   }
   segments.each{|i,s|
     s.sort.each_slice(2){|a,b|
-      (a.ceil...b).each{|j|canvas[i][j]=color}
+      (a.ceil...b).each{|j|canvas[j][i]=color}
     }
   }
 end
 
-(size / 2).times do |y|
-  puts size.times.map{|x|
-    [
-      %( `''"^),
-      %(.:]TYY),
-      %(,;IEPP),
-      %(cjL8RR),
-      %(xLJ&WW),
-      %(xLJ&##)
-    ][canvas[x][2 * y + 1]][canvas[x][2 * y]]
-  }.join.gsub(/ +$/, '')
-end
+puts canvas.each_slice(2).map{|a,b|a.zip(b).map{|i,j|%( `''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.gsub(/ +$/,'')}
