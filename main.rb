@@ -1,5 +1,4 @@
 require 'pry'
-SIZE = 128
 data = File.read 'tompng.svg'
 colors = data.scan(/<path fill="#(.{6})"/).map do |(color)|
   rgb = color.scan(/../).map { |c| c.to_i(16) }
@@ -63,8 +62,8 @@ curves = curves_base.zip(starts).map do |numbers, (x, y)|
 end
 
 def show(canvas)
-  aa = (canvas.size / 2).times.map do |y|
-    line = canvas.size.times.map do |x|
+  lines = (canvas.size / 2).times.map do |y|
+    canvas.size.times.map do |x|
       a = canvas[x][2 * y]
       b = canvas[x][2 * y + 1]
       ai = (a * 3.99).floor
@@ -72,34 +71,31 @@ def show(canvas)
       ai = 1 if a > 0 && ai == 0
       bi = 1 if b > 0 && bi == 0
       [%( '"^),%(.:TY),%(,;EP),%(xLJ#)][bi][ai]
-    end
-    line.join
+    end.join.gsub(/ +$/, '')
   end
-  $><< "\e[1;1H#{aa.join("\n")}"
+  $><< "\e[1;1H\e[2J#{lines.join("\n")}"
 end
 
-def render(curves, colors, time)
-  canvas = Array.new(SIZE) { [0] * SIZE }
-  pos_x = SIZE / 8 * Math.sin(0.7 * time)
-  pos_y = SIZE / 8 * Math.cos(1.1 * time)
-  scale = 0.7 + 0.5 * Math.sin(0.5 * time)
+
+require 'io/console'
+def render(curves, colors, size)
+  rows, cols = IO.console.winsize
+  size = [rows * 2, cols].min
+  canvas = Array.new(size) { [0] * size }
   curves.zip(colors).each do |curve, color|
     coords = []
     curve.each do |x, y, dx1, dy1, dx2, dy2, dx3, dy3|
       dx=dx1+dx2+dx3
       dy=dy1+dy2+dy3
-      step = [[dx.abs, dy.abs].max * SIZE / 1024 / 2, 1].max
+      step = [[dx.abs, dy.abs].max * size / 1024 / 2, 1].max
       step.times do |i|
         t = i.fdiv step
         a = 3 * t * (1 - t) * (1 - t)
         b = 3 * t * t * (1 - t)
         c = t * t * t
-        px = (x + a * dx1 + b * (dx1+dx2) + c * dx) * SIZE / 1024
-        py = (y + a * dy1 + b * (dy1+dy2) + c * dy) * SIZE / 1024
-        coords.push([
-          pos_x + SIZE / 2 + scale * (px - SIZE / 2),
-          pos_y + SIZE / 2 + scale * (py - SIZE / 2)
-        ])
+        px = (x + a * dx1 + b * (dx1+dx2) + c * dx) * size / 1024
+        py = (y + a * dy1 + b * (dy1+dy2) + c * dy) * size / 1024
+        coords.push [px, py]
       end
     end
     prev_x, prev_y = coords.last
@@ -121,7 +117,7 @@ def render(curves, colors, time)
       ys.sort.each_slice(2) do |y1, y2|
         break if y2.nil?
         (y1.ceil...y2).each do |iy|
-          canvas[ix][iy] = color if 0 <= iy && iy < SIZE
+          canvas[ix][iy] = color if 0 <= iy && iy < size
         end
       end
     end
@@ -129,8 +125,6 @@ def render(curves, colors, time)
   show(canvas)
 end
 
-t0 = Time.now
-loop do
-  render curves, colors, Time.now - t0
-  sleep 0.05
-end
+rows, cols = IO.console.winsize
+size = [rows * 2, cols].min
+render curves, colors, size
