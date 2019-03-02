@@ -71,37 +71,32 @@ curves.zip(colors).each do |curve, color|
   curve.each do |x, y, dx1, dy1, dx2, dy2, dx3, dy3|
     dx=dx1+dx2+dx3
     dy=dy1+dy2+dy3
-    step = [[dx.abs, dy.abs].max * size / 1024 / 2, 1].max
+    step = (dx.abs + dy.abs) * size / 1024 + 1
     step.times do |i|
       t = i.fdiv step
       a = 3 * t * (1 - t) * (1 - t)
       b = 3 * t * t * (1 - t)
       c = t * t * t
-      px = (x + a * dx1 + b * (dx1+dx2) + c * dx) * size / 1024
-      py = (y + a * dy1 + b * (dy1+dy2) + c * dy) * size / 1024
-      coords.push [px, py]
+      coords.push [
+        (x + a * dx1 + b * (dx1+dx2) + c * dx) * size / 1024,
+        (y + a * dy1 + b * (dy1+dy2) + c * dy) * size / 1024
+      ]
     end
   end
-  prev_x, prev_y = coords.last
-  xs = coords.map(&:first)
   segments = {}
-  coords.zip(xs.rotate(-1), xs.rotate(1)).each do |(next_x, next_y), xa, xb|
-    x0, x1 = prev_x < next_x ? [prev_x.ceil, next_x.floor] : [next_x.ceil, prev_x.floor]
-    (x0..x1).each do |ix|
-      next if ix == prev_x
-      next if ix == next_x && (xa - next_x) * (xb - next_x) >= 0
-      y = prev_y + (next_y - prev_y) * (ix - prev_x) / ((next_x - prev_x).nonzero? || 1)
-      (segments[ix] ||= []) << y
+  coords.each_with_index do |(next_x, next_y), i|
+    prev_x, prev_y = coords[i-1]
+    xb = coords[i+1-coords.size][0]
+    x0, x1 = [prev_x, next_x].sort
+    (x0.ceil..x1.floor).each do |ix|
+      next if ix == prev_x || (ix == next_x && (prev_x - next_x) * (xb - next_x) >= 0)
+      (segments[ix] ||= []) << prev_y + (next_y - prev_y) * (ix - prev_x) / (next_x - prev_x)
     end
-    prev_x = next_x
-    prev_y = next_y
   end
   segments.each do |ix, ys|
-    break unless canvas[ix]
     ys.sort.each_slice(2) do |y1, y2|
-      break if y2.nil?
       (y1.ceil...y2).each do |iy|
-        canvas[ix][iy] = color if 0 <= iy && iy < size
+        canvas[ix][iy] = color
       end
     end
   end
