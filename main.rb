@@ -7,14 +7,59 @@ colors = data.scan(/<path fill="#(.{6})"/).map do |(color)|
 end
 colors = colors.map { |c| (c - colors.min) / (colors.max - colors.min) * 0.9 + 0.1 }
 
-curves = data.scan(/d="[^"]+"/).map do |s|
-  /M(?<start>-?\d+ -?\d+) c(?<other>.+)/ =~ s
-  x, y = start.split.map(&:to_i)
-  other.split(',').map do |bez|
-    points = [x, y, *bez.split.map(&:to_i)]
-    x += points[6]
-    y += points[7]
-    points
+curves_base = data.scan(/d="[^"]+"/).map do |s|
+  x, y, *other = s.scan(/-?\d+/).map(&:to_i)
+
+  [x, y, *other.each_slice(6).map{|a,b,c,d,e,f|
+    [a, b, c-a, d-b, e-c, f-d]
+  }.flatten]
+end
+
+packed = curves_base.map{|a|
+  [[a.map { |v|
+    next [0, 4.times.map{|i|(v>>i)&1}.reverse] if -8 <= v && v < 8
+    v -= v > 0 ? 8-1 : -8
+    next [1, 0, 5.times.map{|i|(v>>i)&1}.reverse] if -16 <= v && v < 16
+    v -= v > 0 ? 16-1 : -16
+    next [1, 1, 11.times.map{|i|(v>>i)&1}.reverse]
+  }.join+'1'].pack('b*')].pack('m').delete("\n=")
+}
+
+colors = [0.1, 0.4, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8, 1, 1, 1, 1, 1, 1]
+
+curves_base = packed.map do |s|
+  cs = s.unpack('m')[0].unpack('b*')[0].chars.map(&:to_i)
+  cs.pop while cs.last == 0
+  cs.pop
+  aaa = []
+  loop do
+    break if cs.empty?
+    if cs[0] == 0
+      cs.shift
+      v = cs.shift(4).join.to_i(2)
+      v -= 16 if v >= 8
+    elsif cs[1] == 0
+      cs.shift(2)
+      v = cs.shift(5).join.to_i(2)
+      v -= 32 if v >= 16
+      v += v > 0 ? 8 - 1 : -8
+    else
+      cs.shift(2)
+      v = cs.shift(11).join.to_i(2)
+      v -= 2048 if v >= 1024
+      v += v > 0 ? 8 - 1 + 16 - 1 : -8 - 16
+    end
+    aaa << v
+  end
+  aaa
+end
+
+curves = curves_base.map do |(x, y, *other)|
+  other.each_slice(6).map do |bez|
+    [x, y, *bez].tap do
+      x += bez[0]+bez[2]+bez[4]
+      y += bez[1]+bez[3]+bez[5]
+    end
   end
 end
 
@@ -42,15 +87,17 @@ def render(curves, colors, time)
   scale = 0.7 + 0.5 * Math.sin(0.5 * time)
   curves.zip(colors).each do |curve, color|
     coords = []
-    curve.each do |x, y, dx1, dy1, dx2, dy2, dx, dy|
+    curve.each do |x, y, dx1, dy1, dx2, dy2, dx3, dy3|
+      dx=dx1+dx2+dx3
+      dy=dy1+dy2+dy3
       step = [[dx.abs, dy.abs].max * SIZE / 1024 / 2, 1].max
       step.times do |i|
         t = i.fdiv step
         a = 3 * t * (1 - t) * (1 - t)
         b = 3 * t * t * (1 - t)
         c = t * t * t
-        px = (x + a * dx1 + b * dx2 + c * dx) * SIZE / 1024
-        py = (y + a * dy1 + b * dy2 + c * dy) * SIZE / 1024
+        px = (x + a * dx1 + b * (dx1+dx2) + c * dx) * SIZE / 1024
+        py = (y + a * dy1 + b * (dy1+dy2) + c * dy) * SIZE / 1024
         coords.push([
           pos_x + SIZE / 2 + scale * (px - SIZE / 2),
           pos_y + SIZE / 2 + scale * (py - SIZE / 2)
