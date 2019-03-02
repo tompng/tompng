@@ -30,38 +30,46 @@ def show(canvas, n=16)
       bi = b < 0 ? 0 : b >= 1 ? 3 : (b * 4).floor
       ai = 1 if (a>0 && ai == 0)
       bi = 1 if (b>0 && bi == 0)
-      [%( '"^),%(.:TY),%(,;IP),%(xLJ#)][bi][ai]
+      [%( '"^),%(.:TY),%(,;EP),%(xLJ#)][bi][ai]
     end
     puts line.join
   end
 end
 t0 = Time.now
 curves.zip(colors).each do |curve, color|
-  mask = Array.new(SIZE) { [0] * SIZE }
-  prev_x = prev_y = nil
-  curve.each do |x,y,dx1,dy1,dx2,dy2,dx,dy|
-    x += 0.123
-    step = [dx.abs, dy.abs].max * SIZE / 1024 * 8
+  coords = []
+  curve.each do |x, y, dx1, dy1, dx2, dy2, dx, dy|
+    step = [[dx.abs, dy.abs].max * SIZE / 1024 / 2, 1].max
     step.times do |i|
       t = i.fdiv step
-      a = 3*t*(1-t)*(1-t)
-      b = 3*t*t*(1-t)
-      c = t*t*t
-      px = (x+a*dx1+b*dx2+c*dx) * SIZE / 1024
-      py = (y+a*dy1+b*dy2+c*dy) * SIZE / 1024
-      if prev_x && prev_x != px
-        x0, x1 = [prev_x, px].sort
-        (x0.ceil..x1.floor).each do |ix|
-          (py.round...canvas.size).each do |iy|
-            mask[ix][iy] += 1
-          end
-        end
-      end
-      prev_x = px
-      prev_y = py
+      a = 3 * t * (1 - t) * (1 - t)
+      b = 3 * t * t * (1 - t)
+      c = t * t * t
+      px = (x + a * dx1 + b * dx2 + c * dx) * SIZE / 1024
+      py = (y + a * dy1 + b * dy2 + c * dy) * SIZE / 1024
+      coords.push([px, py])
     end
   end
-  SIZE.times { |i| SIZE.times { |j| canvas[i][j] = color if (mask[i][j] % 2 != 0) } }
+  prev_x, prev_y = coords.last
+  segments = {}
+  coords.each do |(next_x, next_y)|
+    x0, x1 = prev_x < next_x ? [prev_x.ceil, next_x.floor] : [next_x.ceil, prev_x.floor]
+    (x0..x1).each do |ix|
+      next if ix == next_x
+      y = prev_y + (next_y - prev_y) * (ix - prev_x) / ((next_x - prev_x).nonzero? || 1)
+      (segments[ix] ||= []) << y
+    end
+    prev_x = next_x
+    prev_y = next_y
+  end
+  segments.each do |ix, ys|
+    ys.sort.each_slice(2) do |y1, y2|
+      break if y2.nil?
+      (y1.ceil...y2).each do |iy|
+        canvas[ix][iy] = color
+      end
+    end
+  end
 end
 
 puts(Time.now - t0)
