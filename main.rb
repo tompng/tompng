@@ -24,11 +24,9 @@ packed = curves_base.zip(starts).map do |numbers,(sx,sy)|
 end
 
 
-require 'io/console'
-
-rows, cols = IO.console&.winsize||[0,0]
-m = [[rows * 2, cols].min,48].max
-g = Array.new(m) { [0] * m }
+require'io/console'
+h,w=IO.console&.winsize||[0,0]
+g=(0...m=[[h*2,w].min,48].max).map{[0]*m}
 packed.map{|x,y,c|
   c=c.unpack('m')[0].unpack('b*')[0].chars
   []while'1'!=c.pop
@@ -38,7 +36,7 @@ packed.map{|x,y,c|
     (v=c.shift(4).join.to_i 2)>7?v-=16:v :
     (v=c.shift(5+2*a=c.shift.to_i).join.to_i 2)>15+a*48?v-40-a*112:v+7+a*15
   )while c[0]
-  c = []
+  c=[]
   n.each_slice(6).map{|q,r,s,t,u,v|
     u+=s+=q
     v+=t+=r
@@ -52,7 +50,7 @@ packed.map{|x,y,c|
   }
   c
 }.zip([1,2,*([3]*8),4,4,*([5]*6)]){|c,a|
-  s = {}
+  s={}
   c.size.times{|i|
     u,v=c[i-2]
     x,y=c[i-1]
