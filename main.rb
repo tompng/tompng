@@ -23,10 +23,40 @@ packed = curves_base.zip(starts).map do |numbers,(sx,sy)|
 end
 
 code = File.read(__FILE__).split(/\nexit\n/).last
-packed_rb = '[' + packed.map { |x,y,s| "[#{x},#{y},%w(#{s})*l]" }.join(',') + ']'
-code = code.gsub('packed', packed_rb).delete("\n ")
-puts code
-eval code
+packed_rb = '[' + packed.map { |x,y,s| "[#{x},#{y},%w(#{s})*l]" }.join(",\n") + ']'
+code = code.gsub('packed', packed_rb)
+
+File.write('tmp.rb', code) unless File.exist? 'tmp.rb'
+tmp = File.read('tmp.rb').delete "\n "
+unless File.exist? 'template.txt'
+  require 'chunky_png'
+  png = ChunkyPNG::Image.from_file 'template.png'
+  ratio = (png.width*png.height).times.count{|xy|(png[xy%png.width,xy/png.width]&0xff00)<0xff00/2}.fdiv(png.width*png.height)
+  w = 160
+  h = (tmp.size / (1-ratio) / w).round
+  p tmp.size, w, h
+  shape = h.times.map{|y|
+    w.times.map{|x|
+      (png[x*png.width/w,y*png.height/h]&0xff00)<0xff00/2 ? ' ' : '#'
+    }.join
+  }.join("\n")
+  File.write 'template.txt', shape
+end
+shape = File.read 'template.txt'
+idx=0
+out=''
+shape.chars.map{|c|
+  if c=='#'
+    out << (tmp[idx] || ';')
+    idx+=1
+  else
+    out << c
+  end
+}
+out << (tmp[idx..-1]||';')
+File.write('out.rb', out)
+code.delete!("\n ")
+eval out
 exit
 
 require'io/console';
