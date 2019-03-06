@@ -20,7 +20,7 @@ yLCEEvW9VkrZIqyhavw  7b/Em0cFOsB0pxP     rRXtzFXcJmQBwn8KA4AAE)*l],[496,205,%w(F
 PX4j7feeOtB)*l],[645,130,%w(AJA8D/NwPBjncT4IxVmcJYKMMEIZ8BC0S33R77dkx3R0FWmrjVXQQZuj0AJb6HR0V5      c1AAE)*l],[433,379,%w(DlrosMMo7aIuIqM6oZO9jB6kB5lZ     IOmTIIkh       gthigzQqox
 ZsggpuozZpY4klNVAj7QS00AILPQQEQgyRZT7ouU2iCIzQFCGEEkQ89ayLFZFIAgmlllBAEWwTQSR1uI/65oeRRkprvfUO      eOQgCjvkkAXWWSeKzjnngQMB)*l],[843,387,%w(ANR+9tv9V                   qvknPXeO+gh
 isAQCsIwi7PEyHkIYwIRAtBD5a231jvjtO2avul3/gMAwMAhGGGEEPQB)*l]].map{|x,y,c|c=c.unpack('m');c=c[0      ].unpack('b*')[0].chars;[]while'1'!=c.pop;n=[];n<<(c             .shift==?0?(v=(
-c.shift(4)*l).to_i 2)>7?v-=16:v :(v=(c.shift(5+2*a=c.shift.to_i)*l).to_i 2)>15+a*48?v-40-a*112:v+7+a*15)while(c[0]);c=[];n.each_slice(6).map{|q,r,s,t,u,v|u+=s+=q;v+=t+=r;n=1+(u.abs
-+v.abs)*(w=m/1024.0);n.to_i.times{|i|a=3*(1-z=i/n)**2*z;c<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]};x+=u;y+=v};c}.zip([1,2,*([3]*8),4,4,*([5]*6)]){|c,a|s={};(0...(c
-.size)).map{|i|u,v=c[i-2];x,y=c[i-1];x0,x1=[u,x].sort;(x0.ceil..x1.floor).each{|j|j!=u&&(j!=x||(u-x)*(c[i][0]-x)<0)&&(s[j]||=[])<<v+(y-v)*(j-u)/(x-u)}};s.each{|i,t|t.sort_by(&:to_f
-).each_slice(2){|u,v|(u.ceil...v).each{|j|g[j][i]=a}}}};puts(g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|%(#{32.chr}`''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}*l).gsub(/\s+$/,l)})
+c.shift(4)*l).to_i(2))>7?v-=16:v:(v=(c.shift(5+2*a=c.shift.to_i)*l).to_i(2))>15+a*48?v-40-a*112:v+7+a*15)while(c[0]);c=[];n.each_slice(6).map{|q,r,s,t,u,v|u+=s+=q;v+=t+=r;n=(u.abs+
+v.abs)*(w=m/1024.0)+1;n.to_i.times{|i|a=3*(1-z=i/n)**2*z;c<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(y+a*r+z**3*v+t*b)*w]};x+=u;y+=v};c}.zip([1,2,*([3]*8),4,4,*([5]*6)]){|c,a|s={};(0...(
+c.size)).each{|i|u,v=c[i-2];x,y=c[i-1];([u,x].min.ceil..[u,x].max.floor).each{|j|j!=u&&(j!=x||(u-x)*(c[i][0]-x)<0)&&(s[j]||=[])<<v+(y-v)*(j-u)/(x-u)}};s.each{|i,t|t.sort_by(&:to_f)
+.each_slice(2){|u,v|(u.ceil...v).each{|j|g[j][i]=a}}}};puts(g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|(%Q(\x20`''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&)+?#*2)[i+6*j]}*l).gsub(/\s+$/,l)})
