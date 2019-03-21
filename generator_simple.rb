@@ -38,7 +38,7 @@ File.write 'tompng_simple.rb', formatted
 puts formatted
 __END__
 i=0;s=%w`a=(q=QUOTE).chars.map{|c|[i=1-i]*(c.ord-32)}*'';952.times{|i|
-  $><<(q[1127-i]||('#".%c'%32)[(a[i]+a[i+952]).to_i(2)])<<$/[~i%34]
+  $><<(q[1127-i]||('#",%c'%32)[(a[i]+a[i+952]).to_i(2)])<<$/[~i%34]
 }`*'';eval(s)
 
    ###
