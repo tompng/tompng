@@ -22,8 +22,15 @@ packed = curves_base.zip(starts).map do |numbers,(sx,sy)|
   [sx,sy,[[bits.join+'1'].pack('b*')].pack('m').delete("\n=")]
 end
 
-# code = File.read('src/dynamic.rb')
-code = File.read('src/static.rb')
+code = case ARGV[0]
+when 'basic'
+  File.read('src/basic.rb')
+when 'viewer'
+  File.read('src/viewer.rb')
+else
+  raise "ARGV[0] should be 'basic' or 'viewer'"
+end
+
 packed_rb = '[' + packed.map { |x,y,s| "[#{x},#{y},%(#{s})]" }.join(",\n") + ']'
 code = code.gsub('packed', packed_rb)
 
