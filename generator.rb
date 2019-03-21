@@ -64,4 +64,5 @@ shape.chars.map{|c|
 out << (tmp[idx..-1]||';')
 File.write('out.rb', out)
 code.delete!("\n ")
+ARGV[0] = '40'
 eval code
