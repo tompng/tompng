@@ -1,0 +1,94 @@
+<script>
+onload = () => {
+  const codeElement = document.querySelector('#code')
+  const height = parseInt(codeElement.getAttribute('data-height') || 0)
+  const width = parseInt(codeElement.getAttribute('data-width') || 0)
+  const code = codeElement.textContent.trim()
+  codeElement.innerHTML = ''
+  const cw = 8
+  const ch = cw * 2
+  const lines = code.split('\n').map(s => s.replace(/ *\|/, ''))
+  const h = ch * lines.length
+  const w = cw * Math.max(...lines.map(s => s.length))
+  const ws = width ? width / w : null
+  const hs = height ? height / h : null
+  const wscale = ws || hs || 1
+  const hscale = hs || ws || 1
+  console.error(wscale, hscale)
+  codeElement.style.width = `${w * wscale}px`
+  codeElement.style.height = `${h * hscale}px`
+  const div = document.createElement('div')
+  div.style.cssText = `
+    width: ${w}px;
+    height: ${h}px;
+    transform: scale(${wscale}, ${hscale});
+    transform-origin: 0 0;
+  `
+  codeElement.appendChild(div)
+  lines.forEach((line, y) => {
+    [...line].forEach((c, x) => {
+      const span = document.createElement('span')
+      span.style.cssText = `
+        position: absolute;
+        width: ${ch / 2}px;
+        height: ${ch}px;
+        line-height: ${ch}px;
+        text-align: center;
+        font-size: ${ch * 0.9}px;
+        left: ${ch * x / 2}px;
+        top: ${ch * y}px;
+      `
+      span.textContent = c
+      div.appendChild(span)
+    })
+  })
+}
+</script>
+<style>
+#code {
+  position: absolute;
+  font-weight: bold;
+  font-family: courier;
+  /* background: #eee; */
+  left: 16px;
+  bottom: 16px;
+  /* top: 193px; */
+}
+#qr {
+  position: absolute;
+  width: 164px;
+  height: 164px;
+  right: 16px;
+  bottom: 16px;
+  /* top: 193px; */
+}
+#card {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  height: 550px;
+  width: 910px;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.4);
+  transform: scale(0.5, 0.5);
+  transform-origin: 0 0;
+  overflow: hidden;
+}
+</style>
+<div id='card'>
+  <div id='code' data-height=164 data-x-width=878>
+    |   i=0
+    |s=%w`a=(q   =%q~'$:,   4/23/6,9 *9):(;   '<%#!:$"!    8!# %9"#$    9"$":#$!9
+    |$'!5&&"2*  $"*#%+"$'&  &)"%&%).%&*-%)$1  $=(9*8(:'9*  6-4015-8+9  ):(:(;'<%"!
+    |   <#;     !$$    9"$  ":"   $":#   '!6  %&"     3(%  "2+#   #'&  %*"$   '&'(
+    |   "%%     &*-    $'(  !!-   %*"2   %<(  9)9     (?"  gnp    mot  @~).   char
+    |   s.map{  |c|[i=1-i]  *(c   .ord   -32  )}*'';952.t  ime    s{|   i|$><<(q[1
+    |   127-i]   ||('#",%   c'%   32)[   (a[  i]+a[i+95    2])    .to     _i(2)])<
+    |                                         <$/                      [~i    %34]
+    |                                         }`*                      '';eval(s)
+  </div>
+  <div style='position:absolute;width:878px;border-radius:0px;left:16px;top:16px;bottom:16px;height:340px;background:#ACBBFD;overflow:hidden'>
+  <img src='../resources/tompng.svg' style='position:absolute;width:340px;border-radius:0px;left:-32px;top:0px;'>
+  </div>
+  <img id='qr' src='qr.svg'>
+  <!-- File.write 'qr.svg', RQRCode::QRCode.new('https://github.com/tompng/tompng', level: :q).as_svg -->
+</div>
