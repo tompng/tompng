@@ -1,4 +1,4 @@
-data = File.read 'tompng.svg'
+data = File.read 'resources/tompng.svg'
 colors = data.scan(/<path fill="#(.{6})"/).map do |(color)|
   rgb = color.scan(/../).map { |c| c.to_i(16) }
   1 - rgb.sum.fdiv(0xff*3)
@@ -31,7 +31,7 @@ File.write('tmp.rb', code) unless File.exist? 'tmp.rb'
 tmp = File.read('tmp.rb').delete "\n "
 unless File.exist? 'template.txt'
   require 'chunky_png'
-  png = ChunkyPNG::Image.from_file 'template.png'
+  png = ChunkyPNG::Image.from_file 'resources/template.png'
   ratio = (png.width*png.height).times.count{|xy|(png[xy%png.width,xy/png.width]&0xff00)<0xff00/2}.fdiv(png.width*png.height)
   w = 184
   h = (tmp.size / (1-ratio) / w).round
