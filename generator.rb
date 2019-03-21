@@ -33,7 +33,7 @@ unless File.exist? 'template.txt'
   require 'chunky_png'
   png = ChunkyPNG::Image.from_file 'resources/template.png'
   ratio = (png.width*png.height).times.count{|xy|(png[xy%png.width,xy/png.width]&0xff00)<0xff00/2}.fdiv(png.width*png.height)
-  w = 184
+  w = 168
   h = (tmp.size / (1-ratio) / w).round
   p tmp.size, w, h
   shape = h.times.map{|y|
@@ -58,4 +58,3 @@ out << (tmp[idx..-1]||';')
 File.write('out.rb', out)
 code.delete!("\n ")
 eval code
-exit
