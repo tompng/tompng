@@ -48,7 +48,7 @@ R=->{
       }
     }
   };
-  $> << "\e[1;1H\e[J"+g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|%(\x20`''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}*l)}*"\r\n"
+  $> << "\e[1;1H\e[J"+g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|%(\x20`'""^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}*l)}*"\r\n"
 };
 R[];
 trap(:WINCH){R[]};

@@ -37,4 +37,4 @@ packed.map{|x,y,c|
     }
   }
 };
-g.each_slice(2){|a,b|puts(a.zip(b).map{|i,j|%(\x20`''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.rstrip)}
+g.each_slice(2){|a,b|puts(a.zip(b).map{|i,j|%(\x20`'""^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.rstrip)}

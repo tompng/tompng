@@ -93,7 +93,7 @@ MAwMAhGGGEEPQB)]].map{|x,y,c|c=c.unpack(?m)[0].unpack('b*')[0].chars;[]while'1'!
 v:(v=(c.shift(5+2*a=c.shift.to_i)*'').to_i(2))>15+a*48?v-40-a*112:v+7+a*15)while(c[0]);c=     [];n.each_slice(6){|q,r,s,t,u,v|u+=s+=q;v+=t+=r;(0               ...n=1+(u
 .abs+v.abs)*w=m/1024.0).each{|i|a=3*(1-z=i/n)**2*z;c<<[(x+a*q+z**3*u+s*b=3*z*z*(1-z))*w,(     y+a*r+z**3*v+t*b)*w]};x+=u;y+=v};c}.zip([1,2,*[3]*8,4,      4,*[5]*6]){|c,
 a|s={};c.size.times{|i|u,v=c[i-2];x,y=c[i-1];p,q=[u,x].sort;(p.ceil..q.floor).each{|j|j!=u&&(j!=x||(u-x)*(c[i][0]-x)<0)&&(s[j]||=[])<<v+(y-v)*(j-u)/(x-u)}};s.each{|i,t|
-t.sort.each_slice(2){|u,v|(u.ceil...v).map{|j|g[j][i]=a}}}};g.each_slice(2){|a,b|puts(a.zip(b).map{|i,j|%(\x20`''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.rstrip)}
+t.sort.each_slice(2){|u,v|(u.ceil...v).map{|j|g[j][i]=a}}}};g.each_slice(2){|a,b|puts(a.zip(b).map{|i,j|%(\x20`'""^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}.join.rstrip)}
 ```
 
 <!-- EMBED: `ruby tompng.rb 40` -->
@@ -112,15 +112,15 @@ t.sort.each_slice(2){|u,v|(u.ceil...v).map{|j|g[j][i]=a}}}};g.each_slice(2){|a,b
                               88888&####REIIIIIIIIIIIL88888LIL88
                              c888&###RR8EIIIIIIIIIL888EEE88EII&E8
                              &88&REIIIEIIIIIIIIL888EIIIIIIEI88##IE,
-                             #88'8L8LIIIIIILL888EIIIIIIIIIIE888#RJI,
+                             #88"8L8LIIIIIILL888EIIIIIIIIIIE888#RJI,
                             ### 88#8&8EE888EEEIIIIIIIIIIIIIIIE8,#8LI,
-                            ##'L88####8IIIIIIIIIIIIIIIIIIIIIIII8 P8LII
+                            ##"L88####8IIIIIIIIIIIIIIIIIIIIIIII8 P8LII
                                88######IIIIIIIIIIIIIIIIIIIEL8IIE  88LI,
                               L8#R####EIIIIIIIIIIIIIIIIIIIE8IIII  I88II,
                              ,8&#8###EIIIIIIIIIIIIIIIIIIIIIIIIII   E88II
                              I8#8I###IIIIIIIIIIIIIIIIIIIIIIIIII'   'LEIII
                              88#I]##RIIIIIIIIIIIIIIIIIIIIIIIII'     ILIII
-                            I8##::888IIIIIIIIIIIIIIIIIIIIIILL'       'LIII
+                            I8##::888IIIIIIIIIIIIIIIIIIIIIILL'       "LIII
                            :I8#P::IEEIIIIIIIIIIIIIIIIIILEEI'          'LI'
                           ::I8#I::IIIIIIIIIIIIIIIIIIJJJJWWW             '
                        ..:::I88I:::IIIIIIIIIIII]]]:YWWWWWWW
@@ -128,14 +128,14 @@ t.sort.each_slice(2){|u,v|(u.ceil...v).map{|j|g[j][i]=a}}}};g.each_slice(2){|a,b
                   .:::::::::I88:::::ELIIIIIII::::::::WWWRRWWWWL:..
                  :::::::::::I8E::::::ELIIILL]:::::::WWR8888RRWWW:::.
                 :::::::::::::]:::::::IIEEEI]::::::::R888888888888j``
-                ::::::::::::::::::::::WWWWW::::::::`'''888888'''''
-                ::::::::::::::::::::::WWWWWW::::`       '888'
+                ::::::::::::::::::::::WWWWW::::::::`"""888888"""""
+                ::::::::::::::::::::::WWWWWW::::`       "888"
                  :::::::::::`:::::::::WWWWWWL``
                  ::::`` ```          c888888888c
                 .:::                 88888888888
-                ::`                 888888888888'
-                ``                  8888888888'
+                ::`                 888888888888"
+                ``                  8888888888"
                                     8888888888
-                                     '    ''8'
+                                     "    ""8"
 
 ```
