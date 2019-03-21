@@ -56,7 +56,7 @@ shape.chars.map{|c|
 out << (tmp[idx..-1]||';')
 File.write('out.rb', out)
 code.delete!("\n ")
-eval out
+eval code
 exit
 
 require'io/console';
