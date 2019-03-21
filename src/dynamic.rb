@@ -1,0 +1,65 @@
+require'io/console';
+cx,w,h,m=cy=0.5;
+zm=2;
+R=->{
+  l='';
+  h,w=IO.console&.winsize||[48]*2;
+  h*=2;m=1.0*[w,h].min;
+  m*zm<=w&&cx=0.5;
+  m*zm<=h&&cy=0.5;
+  g=(0...h).map{[0]*w};
+  packed.map{|x,y,c|
+    c=c.unpack(?m)[0].unpack('b*')[0].chars;
+    []while'1'!=c.pop;
+    n=[];
+    n<<(
+      c.shift==?0 ?
+      (v=(c.shift(4)*l).to_i(2))>7?v-=16:v :
+      (v=(c.shift(5+2*a=c.shift.to_i)*l).to_i(2))>15+a*48?v-40-a*112:v+7+a*15
+    )while(c[0]);
+    c=[];
+    n.each_slice(6){|q,r,s,t,u,v,p=(m*zm/1024.0)|
+      u+=s+=q;
+      v+=t+=r;
+      (0...n=1+(u.abs+v.abs)*p).each{|i|
+        a=3*(1-z=i/n)**2*z;
+        c<<[
+          (x+a*q+z**3*u+s*b=3*z*z*(1-z))*p+(w-m*zm)*cx,
+          (y+a*r+z**3*v+t*b)*p+(h-m*zm)*cy
+        ]
+      };
+      x+=u;
+      y+=v
+    };
+    c
+  }.zip([1,2,*([3]*8),4,4,*([5]*6)]){|c,a|
+    s={};
+    c.size.times{|i|
+      u,v=c[i-2];
+      x,y=c[i-1];
+      p,q=[u,x].sort;
+      ([p.ceil,0].max..[q.floor,w-1].min).each{|j|
+        j!=u&&(j!=x||(u-x)*(c[i][0]-x)<0)&&(s[j]||=[])<<v+(y-v)*(j-u)/(x-u)
+      }
+    };
+    s.map{|i,t|
+      t.sort.each_slice(2){|u,v|
+        ([u.ceil,0].max...[v,h].min).map{|j|g[j][i]=a}
+      }
+    }
+  };
+  $> << "\e[1;1H\e[J"+g.each_slice(2).map{|a,b|(a.zip(b).map{|i,j|%(\x20`''"^.:]TYY,;IEPPcjL8RRxLJ&WWxLJ&##)[i+6*j]}*l)}*"\r\n"
+};
+R[];
+trap(:WINCH){R[]};
+STDIN.raw{
+  loop{
+    s=$<.getc;
+    s.ord==3&&exit;
+    s=="\e"&&s<<$<.gets(2);
+    zm=[1,16,zm*2**(('-m+p'.index(s)||1.0)/2*2-1)].sort[1];
+    cx=[0,cx+(s=~/[ahD]/?1:s=~/[dlC]/?-1:0)*w/(w-m*zm+1)/2,1].sort[1];
+    cy=[0,cy+(s=~/[wkA]/?1:s=~/[sjB]/?-1:0)*h/(h-m*zm+1)/2,1].sort[1];
+    R[]
+  }
+}
